@@ -1,5 +1,5 @@
 user 
     - register ✅
-    - login
+    - login ✅
     - logout
-    - getMe
+    - getMe ✅

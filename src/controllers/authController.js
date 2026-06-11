@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
+import blackListTokens from "../models/blacklistTokenModel.js";
 
 export async function userRegisterController(req, res) {
   const { username, email, password } = req.body;
@@ -89,7 +90,7 @@ export async function userLoginController(req, res) {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false, // production me true
+    secure: false, 
     sameSite: "lax",
   });
 
@@ -101,4 +102,48 @@ export async function userLoginController(req, res) {
     message: "Login successful",
     user: userData,
   });
+}
+
+export async function getMeController(req, res) {
+
+    const user = await userModel.findById(req.user).select("-password")
+
+    if(!user){
+        return res.status(404).json({
+            success: false,
+            message: "user not found"
+        })
+    }
+    
+    return res.status(200).json({
+        success: true,
+        message: "User fetched successfully",
+        user
+    })
+
+    
+}
+
+export async function logoutController(req, res) {
+    const token = req.cookies.token
+    if (!token) {
+        return res.status(400).json({
+            success: false,
+            message: "No token found"
+        })
+    }
+
+    const decodeToken = jwt.verify(token, process.env.JWT_SECRET)
+
+    const blackListToken = await blackListTokens.create({
+        token,
+        expireAt: new Date(decodeToken.exp * 1000)
+    })
+
+    res.clearCookie("token")
+
+    return res.status(200).json({
+        success: true,
+        message: "User logout successfully"
+    })
 }
