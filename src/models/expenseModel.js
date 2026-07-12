@@ -1,17 +1,17 @@
-import mongoose, { Mongoose } from "mongoose"
+import mongoose from "mongoose";
 
-const incomeSchema = new mongoose.Schema({
+const expenseSchema = mongoose.Schema({
     description: {
-        type: String,
-        required: true
-    },
-    category: {
         type: String,
         required: true
     },
     amount: {
         type: Number,
         required: true
+    },
+    category: {
+        type: String,
+        required: true,
     },
     date: {
         type: Date,
@@ -22,11 +22,11 @@ const incomeSchema = new mongoose.Schema({
         ref: "user",
         required: true
     },
-    default: {
+    type: {
         type: String,
-        default: "income"
-    }
-}, {timestamps: true})
+        default: "expense",
+    },
+}, { timestamps: true })
 
-const incomeModel = mongoose.model("income", incomeSchema)
-export default incomeModel
+const expenseModel = mongoose.model("expense", expenseSchema)
+export default expenseModel
